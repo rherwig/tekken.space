@@ -1,0 +1,53 @@
+.button {
+    $size: 39%;
+
+    width: $size;
+    height: $size;
+
+    @apply absolute;
+    @apply border border-transparent rounded-full;
+    @apply flex items-center justify-center;
+    @apply text-[80%] text-slate-900 font-medium leading-none;
+}
+
+.arcade1 {
+    @apply left-0 bottom-0;
+    @apply -translate-y-full;
+    @apply ml-1.5 mb-0.5;
+}
+
+.arcade2 {
+    @apply right-0 top-0;
+    @apply mr-1.5;
+}
+
+.arcade3 {
+    @apply left-0 bottom-0;
+    @apply ml-1.5;
+}
+
+.arcade4 {
+    @apply right-0 top-0;
+    @apply translate-y-full;
+    @apply mr-1.5 mt-0.5;
+}
+
+.gamepad1 {
+    @apply left-0 top-1/2;
+    @apply -translate-y-1/2
+}
+
+.gamepad2 {
+    @apply top-0 left-1/2;
+    @apply -translate-x-1/2;
+}
+
+.gamepad3 {
+    @apply bottom-0 left-1/2;
+    @apply -translate-x-1/2;
+}
+
+.gamepad4 {
+    @apply top-1/2 right-0;
+    @apply -translate-y-1/2
+}

@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#__next {
+    @apply w-full h-full;
+    @apply scrollbar scrollbar-thin scrollbar-track-zinc-800 scrollbar-thumb-rounded-sm scrollbar-thumb-zinc-950;
+}
+
+body {
+    @apply bg-background;
+}
+
+* {
+    @apply text-copy;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+

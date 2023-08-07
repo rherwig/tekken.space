@@ -1,0 +1,11 @@
+{
+    "name": "@tekken-space/parser",
+    "version": "0.0.1",
+    "scripts": {
+        "dev": "vite-node src/index.ts"
+    },
+    "dependencies": {},
+    "main": "./index.js",
+    "module": "./index.mjs",
+    "typings": "./index.d.ts"
+}

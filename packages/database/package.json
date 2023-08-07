@@ -1,0 +1,11 @@
+{
+    "name": "@tekken-space/database",
+    "version": "0.0.1",
+    "main": "./index.js",
+    "module": "./index.mjs",
+    "typings": "./index.d.ts",
+    "scripts": {
+        "migrate:dev": "prisma migrate dev",
+        "generate": "prisma generate"
+    }
+}
