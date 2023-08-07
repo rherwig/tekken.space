@@ -1,20 +1,30 @@
 {
-  "compileOnSave": false,
-  "compilerOptions": {
-    "rootDir": ".",
-    "sourceMap": true,
-    "declaration": false,
-    "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "target": "es2015",
-    "module": "esnext",
-    "lib": ["es2020", "dom"],
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "baseUrl": ".",
-    "paths": {}
-  },
-  "exclude": ["node_modules", "tmp"]
+    "compileOnSave": false,
+    "compilerOptions": {
+        "rootDir": ".",
+        "sourceMap": true,
+        "declaration": false,
+        "moduleResolution": "node",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "importHelpers": true,
+        "target": "es2022",
+        "module": "esnext",
+        "lib": ["es2020", "dom"],
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
+        "baseUrl": ".",
+        "paths": {
+            "@tekken-space/database": ["packages/database/src/index.ts"],
+            "@tekken-space/eslint-config": ["packages/eslint-config/index.js"],
+            "@tekken-space/eslint-config/qwik": [
+                "packages/eslint-config/qwik.js"
+            ],
+            "@tekken-space/normalizer": ["packages/normalizer/src/index.ts"],
+            "@tekken-space/parser": ["packages/parser/src/index.ts"],
+            "@tekken-space/ui": ["packages/ui/src/index.ts"],
+            "@tekken-space/utils": ["packages/utils/src/index.ts"]
+        }
+    },
+    "exclude": ["node_modules", "tmp"]
 }
