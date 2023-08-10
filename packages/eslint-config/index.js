@@ -8,21 +8,27 @@ const rules = [
     './rules/node',
     './rules/variables',
     './rules/typescript',
-].map((file) => require.resolve(file));
+    './rules/prettier'
+].map(file => require.resolve(file));
 
 module.exports = {
-    extends: [
-        'eslint:recommended',
-        'plugin:@typescript-eslint/recommended',
-        ...rules,
-    ],
+    extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', ...rules, 'prettier'],
     parser: '@typescript-eslint/parser',
     parserOptions: {
-        parser: '@typescript-eslint/parser',
+        parser: '@typescript-eslint/parser'
     },
-    plugins: ['import', '@typescript-eslint'],
+    plugins: ['@typescript-eslint', 'import', 'prettier'],
     env: {
         browser: true,
-        node: true,
+        node: true
     },
+    overrides: [
+        {
+            files: ['*.json'],
+            parser: 'jsonc-eslint-parser',
+            rules: {
+                '@nx/dependency-checks': 'error'
+            }
+        }
+    ]
 };

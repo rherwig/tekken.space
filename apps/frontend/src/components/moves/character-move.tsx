@@ -13,7 +13,7 @@ export default component$<Props>(({ move }) => {
 
     return (
         <section class="border-l-primary border-l-2 bg-black/25">
-            <div class="flex flex-col gap-2 p-4">
+            <div class="flex flex-col">
                 <div class="flex items-center justify-between">
                     <h3>{move.name}</h3>
                     <div>
@@ -46,6 +46,7 @@ export default component$<Props>(({ move }) => {
                         key={index}
                     >
                         <h3 class="text-sm">{variant.name}</h3>
+
                         <GenericMove
                             notation={variant.notation}
                             hiddenMoves={[0]}

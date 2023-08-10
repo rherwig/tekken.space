@@ -1,10 +1,10 @@
 import { component$ } from '@builder.io/qwik';
-import type { TekkenMove } from '@tekken-space/parser';
+import type { ParsedMove } from '@tekken-space/parser';
 
 import GenericInstruction from './generic-instruction';
 
 interface Props {
-    move: TekkenMove;
+    move: ParsedMove;
 }
 
 export default component$<Props>((props) => {

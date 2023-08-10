@@ -1,9 +1,6 @@
 {
     "extends": "@tekken-space/eslint-config",
     "root": true,
-    "ignorePatterns": [
-        "**/*"
-    ],
     "plugins": [
         "@nx"
     ],

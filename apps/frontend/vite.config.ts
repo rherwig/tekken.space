@@ -19,6 +19,7 @@ export default defineConfig({
         }),
         tsconfigPaths({ root: '../../' }),
     ],
+    optimizeDeps: { include: ['@auth/core'] },
     server: {
         fs: {
             // Allow serving files from the project root

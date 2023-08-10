@@ -1,10 +1,9 @@
-import type { FrameData, MoveFrames } from '@tekken-space/database';
+import type { FrameData, MoveFrames, MoveProperties } from '@tekken-space/database';
 import { prisma } from '@tekken-space/database';
 import type { Character, Move } from '@prisma/client';
-import { slugify } from '@tekken-space/utils';
+import { slugify, slugifyCharacterName } from '@tekken-space/utils';
 import { parseTekkenNotation } from '@tekken-space/parser';
 
-import kazuyaMeta from './assets/meta/kazuya.json';
 import type { RawMovesMetadata } from './types';
 
 const NOTATION_SANITIZATIONS = [
@@ -13,98 +12,185 @@ const NOTATION_SANITIZATIONS = [
     [/S!/gi, ''],
     [/WAKE UP/gi, '"WAKE UP",'],
     [/LOW PARRY/gi, '"LOW PARRY"'],
-    [/CH/gi, '"CH",'],
-    [/FC/gi, '"FC",'],
+    [/CH/gi, 'CH,'],
+    [/FC/gi, 'FC,'],
     [/EWGF/gi, '"EWGF"'],
     [/([dfub])([dfub])/gi, '$1/$2'],
     [/[()]/g, ''],
 ];
 
-const COMBO_NOTATION_SANITIZATIONS = [
-    [/\s+/g, ';'],
-];
+const COMBO_NOTATION_SANITIZATIONS = [[/\s+/g, ';']];
+
+/**
+ * Starts the import of all characters.
+ */
+async function startCharacterImport() {
+    // await start('Akuma');
+    // await start('Alisa');
+    // await start('Anna');
+    // await start('Armor King');
+    // await start('Asuka');
+    // await start('Bob');
+    // await start('Bryan');
+    // await start('Claudio');
+    // await start('Devil Jin');
+    // await start('Dragunov');
+    // await start('Eddy');
+    // await start('Eliza');
+    // await start('Fahkumram');
+    // await start('Feng');
+    // await start('Ganryu');
+    // await start('Geese');
+    // await start('Gigas');
+    // await start('Heihachi');
+    // await start('Hwoarang');
+    await start('Jack-7', await import('./assets/meta/jack-7.json'));
+    // await start('Jin');
+    // await start('Josie');
+    // await start('Julia');
+    // await start('Katarina');
+    // await start('Kazumi');
+    await start('Kazuya', await import('./assets/meta/kazuya.json'));
+    // await start('King');
+    // await start('Kuma');
+    // await start('Kunimitsu');
+    // await start('Lars');
+    // await start('Law');
+    // await start('Lee');
+    // await start('Lei');
+    // await start('Leo');
+    // await start('Leroy');
+    // await start('Lidia');
+    // await start('Lili');
+    // await start('Lucky Chloe');
+    // await start('Marduk');
+    // await start('Master Raven');
+    // await start('Miguel');
+    // await start('Negan');
+    // await start('Nina');
+    // await start('Noctis');
+    // await start('Paul');
+    // await start('Panda');
+    // await start('Shaheen');
+    // await start('Steve');
+    // await start('Xiaoyu');
+    // await start('Yoshimitsu');
+    // await start('Zafina');
+}
 
 /**
  * Normalizes a character's JSON metadata and imports it into the database.
+ * @param name
  * @param meta
  */
-async function start(meta: RawMovesMetadata) {
-    const character = await findOrCreateCharacter('kazuya', 'Kazuya');
+async function start(name: string, meta?: RawMovesMetadata) {
+    const character = await findOrCreateCharacter(slugifyCharacterName(name), name);
     console.info(`:: Retrieved character: ${character.name}`);
 
+    if (!meta) {
+        console.info(`:: No metadata found for ${character.name}. Skipping move import.`);
+        return;
+    }
+
     console.info(`:: Importing ${meta.keyMoves.length} key moves.`);
-    await importKeyMoves(character.id, meta.keyMoves);
+    await importKeyMoves(character, meta.keyMoves);
 
     console.info(`:: Importing ${meta.standingPunishers.length} standing punishes.`);
-    await importPunishes(character.id, meta.standingPunishers);
+    await importPunishes(character, meta.standingPunishers, {
+        isStandingPunish: true,
+    });
 
     console.info(`:: Importing ${meta.crouchingPunishers.length} crouching punishes.`);
-    await importPunishes(character.id, meta.crouchingPunishers);
+    await importPunishes(character, meta.crouchingPunishers, {
+        isCrouchingPunish: true,
+    });
 
     console.info(`:: Importing ${meta.standardCombos.length} combos.`);
-    await importStandardCombos(character.id, meta.standardCombos);
+    await importStandardCombos(character, meta.standardCombos);
 }
 
 /**
  * Imports the key moves of a character into the database.
- * @param characterId
+ * @param character
  * @param keyMoves
  */
-async function importKeyMoves(characterId: string, keyMoves: string[]) {
+async function importKeyMoves(character: Character, keyMoves: string[]) {
     for (const move of keyMoves) {
         const notation = sanitizeNotation(move);
-        const slug = slugify(notation);
 
-        await upsertMove(characterId, slug, notation, {
-            isImported: true,
-        }, {
-            isKeyMove: true,
-        });
+        await upsertMove(
+            character,
+            notation,
+            {
+                isImported: true,
+            },
+            {
+                isKeyMove: true,
+            },
+        );
     }
 }
 
 /**
  * Imports the punishes of a character into the database.
- * @param characterId
+ * @param character
  * @param standingPunishes
+ * @param properties
  */
-async function importPunishes(characterId: string, standingPunishes: string[][]) {
+async function importPunishes(
+    character: Character,
+    standingPunishes: string[][],
+    properties: Partial<MoveProperties> = {},
+) {
     for (const punish of standingPunishes) {
         const [frames, move, alternative] = punish;
 
         const notation = sanitizeNotation(move);
-        const slug = slugify(notation);
         const startup: FrameData = {
             rawValue: frames,
             min: parseInt(frames.replace(/f/i, ''), 10),
         };
 
-        await upsertMove(characterId, slug, notation, {
-            isImported: true,
-        }, {
-            isStandingPunish: true,
-        }, {
-            startup,
-        });
+        await upsertMove(
+            character,
+            notation,
+            {
+                isImported: true,
+            },
+            properties,
+            {
+                startup,
+            },
+        );
 
         if (!alternative) {
             continue;
         }
 
         const alternativeNotation = sanitizeNotation(alternative);
-        const alternativeSlug = slugify(alternativeNotation);
 
-        await upsertMove(characterId, alternativeSlug, alternativeNotation, {
-            isImported: true,
-        }, {
-            isStandingPunish: true,
-        }, {
-            startup,
-        });
+        await upsertMove(
+            character,
+            alternativeNotation,
+            {
+                isImported: true,
+            },
+            {
+                isStandingPunish: true,
+            },
+            {
+                startup,
+            },
+        );
     }
 }
 
-async function importStandardCombos(characterId: string, standardCombos: string[][]) {
+/**
+ * Imports the standard combos of a character into the database.
+ * @param character
+ * @param standardCombos
+ */
+async function importStandardCombos(character: Character, standardCombos: string[][]) {
     for (const combo of standardCombos) {
         const [rawNotation, ...launchers] = combo;
         if (!launchers.length) {
@@ -113,30 +199,49 @@ async function importStandardCombos(characterId: string, standardCombos: string[
 
         const launcher = sanitizeNotation(launchers[0]).replace(/\s+/g, '');
         const extender = sanitizeComboNotation(sanitizeNotation(rawNotation));
-
         const notation = `${launcher};${extender}`;
-        const slug = slugify(notation);
 
-        await upsertMove(characterId, slug, notation, {
-            isImported: true,
-        }, {
-            isStandardCombo: true,
-        });
+        await upsertMove(
+            character,
+            notation,
+            {
+                isImported: true,
+            },
+            {
+                isStandardCombo: true,
+            },
+            undefined,
+            true,
+        );
     }
 }
 
 /**
  * Creates a new move in the database or updates an existing one.
  * When updating, the slug is used to find the move. Properties and metadata are merged.
- * @param characterId
- * @param slug
+ * @param character
  * @param notation
  * @param metadata
  * @param properties
  * @param moveFrames
  */
-async function upsertMove(characterId: string, slug: string, notation: string, metadata: Record<string, any>, properties: Record<string, any>, moveFrames?: MoveFrames): Promise<Move> {
+async function upsertMove(
+    character: Character,
+    notation: string,
+    metadata: Record<string, any>,
+    properties: Record<string, any>,
+    moveFrames?: MoveFrames,
+    isCombo = false,
+): Promise<Move | null> {
+    const slug = slugify(notation, character.slug);
     console.info(`Importing move: ${notation}`);
+
+    try {
+        parseTekkenNotation(notation);
+    } catch (error: any) {
+        console.warn(`Invalid notation: ${notation}`);
+        return null;
+    }
 
     const move = await prisma.move.findUnique({
         where: {
@@ -151,12 +256,13 @@ async function upsertMove(characterId: string, slug: string, notation: string, m
 
         return prisma.move.create({
             data: {
-                characterId,
+                characterId: character.id,
                 slug,
                 notation,
                 metadata,
                 properties,
                 frames,
+                isCombo,
             },
         });
     }
@@ -170,17 +276,18 @@ async function upsertMove(characterId: string, slug: string, notation: string, m
         data: {
             notation,
             metadata: {
-                ...move.metadata as Record<string, any>,
+                ...(move.metadata as Record<string, any>),
                 ...metadata,
             },
             properties: {
-                ...move.properties as Record<string, any>,
+                ...(move.properties as Record<string, any>),
                 ...properties,
             },
             frames: {
-                ...move.frames as Record<string, any>,
+                ...(move.frames as Record<string, any>),
                 ...frames,
             },
+            isCombo,
         },
     });
 }
@@ -202,6 +309,10 @@ async function findOrCreateCharacter(slug: string, name: string): Promise<Charac
             data: {
                 slug,
                 name,
+                imageUrl: `/images/characters/${slug}.png`,
+                metadata: {
+                    isImported: true,
+                },
             },
         });
 
@@ -233,4 +344,4 @@ function sanitizeComboNotation(notation: string): string {
     }, notation);
 }
 
-start(kazuyaMeta).catch(console.error);
+startCharacterImport().catch(console.error);

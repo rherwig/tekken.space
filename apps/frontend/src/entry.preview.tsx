@@ -10,9 +10,10 @@
  * - https://vitejs.dev/config/preview-options.html#preview-options
  *
  */
+/* eslint-disable */
 import { createQwikCity } from '@builder.io/qwik-city/middleware/node';
-import render from './entry.ssr';
 import qwikCityPlan from '@qwik-city-plan';
+import render from './entry.ssr';
 
 /**
  * The default export is the QwikCity adaptor used by Vite preview.

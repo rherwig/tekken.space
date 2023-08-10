@@ -1,4 +1,3 @@
-import type { TekkenInput } from '@tekken-space/parser';
 import clsx from 'classnames';
 import { component$ } from '@builder.io/qwik';
 
@@ -14,7 +13,7 @@ export enum ControllerLayout {
 }
 
 interface Props {
-    inputs: TekkenInput[];
+    actions: string[];
     scheme?: ControllerLayout;
 }
 
@@ -62,7 +61,6 @@ const buttonSchemes: Record<ControllerLayout, string[]> = {
 };
 
 export default component$((props: Props) => {
-    const inputNotations = props.inputs.map((input) => input.notation);
     const inactiveColor = 'bg-white';
     const scheme = props.scheme ?? 'GAMEPAD';
     const activeColors = colorSchemes[scheme];
@@ -75,7 +73,7 @@ export default component$((props: Props) => {
                 class={clsx(
                     styles.button,
                     isArcadeLayout ? styles.arcade1 : styles.gamepad1,
-                    inputNotations.includes('1')
+                    props.actions.includes('1')
                         ? activeColors.at(0)
                         : inactiveColor,
                 )}
@@ -86,7 +84,7 @@ export default component$((props: Props) => {
                 class={clsx(
                     styles.button,
                     isArcadeLayout ? styles.arcade2 : styles.gamepad2,
-                    inputNotations.includes('2')
+                    props.actions.includes('2')
                         ? activeColors.at(1)
                         : inactiveColor,
                 )}
@@ -97,7 +95,7 @@ export default component$((props: Props) => {
                 class={clsx(
                     styles.button,
                     isArcadeLayout ? styles.arcade3 : styles.gamepad3,
-                    inputNotations.includes('3')
+                    props.actions.includes('3')
                         ? activeColors.at(2)
                         : inactiveColor,
                 )}
@@ -108,7 +106,7 @@ export default component$((props: Props) => {
                 class={clsx(
                     styles.button,
                     isArcadeLayout ? styles.arcade4 : styles.gamepad4,
-                    inputNotations.includes('4')
+                    props.actions.includes('4')
                         ? activeColors.at(3)
                         : inactiveColor,
                 )}

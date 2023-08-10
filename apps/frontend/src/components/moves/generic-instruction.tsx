@@ -1,42 +1,77 @@
 import { component$ } from '@builder.io/qwik';
-import type { TekkenInstruction } from '@tekken-space/parser';
-import { TekkenInstructionType } from '@tekken-space/parser';
+import type { ParsedInstruction } from '@tekken-space/parser';
 import { ActionControls, MovementControls, Tag } from '@tekken-space/ui';
 
+import GenericInstruction from './generic-instruction';
+
 interface Props {
-    instruction: TekkenInstruction;
+    instruction: ParsedInstruction;
 }
 
-export default component$<Props>((props) => {
-    if (props.instruction.type === TekkenInstructionType.HIDDEN) {
-        return null;
+export default component$<Props>(({ instruction }) => {
+    if (instruction.type === 'compound') {
+        return (
+            <div class="flex items-center gap-2">
+                {instruction.children.map((child) => (
+                    <>
+                        <GenericInstruction instruction={child}/>
+                        {child.combinator && <span class="combinator">{child.combinator}</span>}
+                    </>
+                ))}
+            </div>
+        );
     }
 
-    if (props.instruction.type === TekkenInstructionType.MOVEMENT) {
-        return <MovementControls slug={props.instruction.slug} />;
+    if (instruction.type === 'movement') {
+        return (
+            <div class="flex items-center gap-2">
+                <MovementControls notation={instruction.notation}/>
+            </div>
+        );
     }
 
-    if (props.instruction.type === TekkenInstructionType.ACTION) {
-        return <ActionControls inputs={props.instruction.inputs} />;
+    if (instruction.type === 'action') {
+        if (/^\d(?:\+\d)*$/.test(instruction.notation)) {
+            return (
+                <div class="flex items-center gap-2">
+                    <ActionControls actions={instruction.notation.split('+')}/>
+                </div>
+            );
+        }
+
+        if (instruction.children) {
+            return (
+                <div class="flex items-center gap-2">
+                    {instruction.children.map((child) => (
+                        <>
+                            <ActionControls actions={[child.notation]}/>
+                            {child.combinator && <span class="combinator">{child.combinator}</span>}
+                        </>
+                    ))}
+                </div>
+            );
+        }
     }
 
-    if (props.instruction.type === TekkenInstructionType.CONTROL) {
-        return <div class="flex gap-2">control</div>;
+    if (instruction.type === 'special') {
+        return (
+            <div class="flex items-center gap-2 mr-2">
+                <Tag color={'yellow'}>{instruction.notation}</Tag>
+            </div>
+        );
     }
 
-    if (props.instruction.type === TekkenInstructionType.TEXT) {
-        return <div class="flex gap-2">text</div>;
+    if (instruction.type === 'text') {
+        return (
+            <div class="flex items-center gap-2 mr-2">
+                <Tag>{instruction.notation}</Tag>
+            </div>
+        );
     }
-
-    if (props.instruction.type === TekkenInstructionType.SPECIAL) {
-        return <div class="flex gap-2">special</div>;
-    }
-
-    const isRage = props.instruction.slug.toLowerCase().includes('rage');
 
     return (
         <div class="flex items-center">
-            <Tag color={isRage ? 'red' : 'gray'}>{props.instruction.slug}</Tag>
+            ?? {instruction.notation} ??
         </div>
     );
 });

@@ -1,8 +1,14 @@
+const { resolve, join } = require('path');
 const colors = require('tailwindcss/colors');
+
+const NX_ROOT = resolve(__dirname, '../../');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
+    content: [
+        join(NX_ROOT, 'apps/frontend/src/**/*.{js,ts,jsx,tsx,mdx}'),
+        join(NX_ROOT, 'packages/ui/src/**/*.{js,ts,jsx,tsx,mdx}'),
+    ],
     theme: {
         extend: {
             container: {
@@ -16,6 +22,10 @@ module.exports = {
                 info: colors.blue[500],
                 background: colors.zinc[900],
                 copy: colors.zinc[100],
+            },
+
+            fontSize: {
+                display: '8rem',
             },
         },
     },

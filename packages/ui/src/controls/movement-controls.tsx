@@ -4,12 +4,13 @@ import Arrow from './movement/arrow';
 import Neutral from './movement/neutral';
 
 interface Props {
-    slug: string;
+    notation: string;
 }
 
 export default component$<Props>((props) => {
-    const isNeutral = props.slug === 'N' || props.slug === 'n';
-    const isHoldInput = props.slug.toLowerCase() !== props.slug;
+    const notation = props.notation.replace('/', '');
+    const isNeutral = notation === 'N' || notation === 'n';
+    const isHoldInput = notation.toLowerCase() !== notation;
 
     return (
         <div class="relative flex h-full items-center justify-center">
@@ -17,7 +18,7 @@ export default component$<Props>((props) => {
 
             {!isNeutral && (
                 <Arrow
-                    direction={props.slug.toLowerCase() as any}
+                    direction={notation.toLowerCase() as any}
                     hold={isHoldInput}
                 />
             )}

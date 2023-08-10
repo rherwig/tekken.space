@@ -26,7 +26,7 @@ export default component$<Props>((props) => {
     const hiddenMoveIndexes = props.hiddenMoves ?? [];
 
     return (
-        <div class="flex gap-2">
+        <div class="flex gap-2 px-4 py-4 overflow-x-auto overflow-y-hidden scrollbar scrollbar-thin scrollbar-track-zinc-800 scrollbar-thumb-rounded-sm scrollbar-thumb-zinc-950">
             {moves.value.map((move, index) => (
                 <div
                     key={index}

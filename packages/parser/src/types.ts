@@ -1,29 +1,22 @@
-export enum TekkenInstructionType {
-    UNKNOWN = 'UNKNOWN',
-    MOVEMENT = 'MOVEMENT',
-    ACTION = 'ACTION',
-    SPECIAL = 'SPECIAL',
-    TEXT = 'TEXT',
-    CONTROL = 'CONTROL',
-    HIDDEN = 'HIDDEN',
-}
+export type InstructionType = 'action' | 'movement' | 'compound' | 'text' | 'special' | 'unknown';
+export type CombinatorType = '+' | '/' | ':' | '~' | '<';
 
-export interface TekkenInput {
+export interface ParsedCombo {
     notation: string;
+    moves: ParsedMove[];
 }
 
-export interface TekkenInstruction {
-    type: TekkenInstructionType;
+export interface ParsedMove {
     notation: string;
-    slug: string;
-    inputs: TekkenInput[];
+    instructions: ParsedInstruction[];
 }
 
-export interface TekkenMove {
+export interface ParsedInstruction {
     notation: string;
-    instructions: TekkenInstruction[];
+    type: InstructionType;
+    children: ParsedChildInstruction[];
 }
 
-export interface TekkenCombo {
-    moves: TekkenMove[];
+export interface ParsedChildInstruction extends ParsedInstruction {
+    combinator?: CombinatorType;
 }
